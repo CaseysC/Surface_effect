@@ -1,0 +1,337 @@
+---
+title: "Testing leaf surface effect on interction with Botrytis"
+author: "Celine Caseys"
+date: "7/29/2024"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This notebook aims to compile and annotate the R scripts used for the analysis of the Leaf surface-Botrytis dataset. 
+
+This notebook charges R scripts that contain all the code. The main result figures are plotted directly in the notebook.
+
+
+# Experimental design:
+
+Sixteen Eudicot species and 20 A.thaliana genotypes were analyzed. Detached leaves were inoculated with Botrytis in 'experimental trays', that constitutes a micro-environment for a randomized collection of isolates. After 72h, pictures of all trays were taken. Image analysis for calculation of lesion area (and many other parameters) was conducted in R. 
+
+For image analysis R codes, see the Image_analysis_pipeline_Final R notebook. 
+
+# 1. Testing the leaf surface effect across 16 eudicot species
+
+Associated files:
+
+- Eudi16_72h_all1.txt
+
+- Stomata_forPlot.txt
+
+- Eudicot_Stomata_counts_col.txt
+
+R Code: 
+
+- Eudi_UD_analysis_final.R
+
+```{r message=FALSE,warning=FALSE, include=FALSE}
+source('~/Desktop/Github_Surface/Eudi_UD_analysis_final.R')
+
+```
+
+```{r message=FALSE,warning=FALSE}
+
+## Figure S1A
+ggplot(data=Eudi_UD, aes(x=Order_Plot_final, y=Lesion_mm2, color=Species)) +
+  geom_boxplot(width=0.5, show.legend = FALSE)+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+ggplot(data=Asterids, aes(x=Order_Plot, y=Lesion_mm2, color=Species)) +
+  geom_boxplot()+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  ggtitle("Asterids")
+ 
+
+ggplot(data=Rosids, aes(x=Order_Plot, y=Lesion_mm2, color=Species)) +
+  geom_boxplot()+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  ggtitle("Rosids")
+
+ggplot(data=Core, aes(x=Order_Plot, y=Lesion_mm2, color=Species)) +
+  geom_boxplot()+
+  theme_bw()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  ggtitle("Caryophyllales")
+
+## Figure S1B
+ggplot(ModelRes, aes(Species, PercVar, fill=Param1)) +
+  geom_col()+
+  scale_fill_manual(values=c("#f1b6da", "#7b3294", "#92c5de","#bababa","#ffffbf"))+
+  geom_text(aes(label=PercVar1), position=position_stack(vjust=0.5), size=3)+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+
+ggplot(Surface_diff_LSM, aes(species_plot, Std_Diff, color=species_plot)) +
+  geom_point(size=2.5, show.legend = FALSE)+
+  scale_color_manual(values=Eudi16_color)+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  ylab("LS-mean Surface Differential")
+
+  
+  
+ggplot(Surface_diff_LSM, aes(species_plot, emmean_sp, color=species_plot)) +
+    geom_point(size=2.5)+
+    scale_color_manual(values=Eudi16_color)+
+    theme_minimal()+
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+    ylab("LS-mean Lesion Area [mm2]")
+  
+  
+ggplot(Surface_diff_LSM, aes(species_plot, Stom_Diff, color=species_plot)) +
+    geom_point(size=2.5)+
+    scale_color_manual(values=Eudi16_color)+
+    theme_minimal()+
+    theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+    ylab("LS-mean Stomata Differential")
+
+ ggplot(Lesion_LS_centered, aes(SpSurf, emmean, color=species_plot, shape=Surface)) +
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=emmean-SE, ymax=emmean+SE), width=.8, position = position_dodge(0.1), show.legend = FALSE)+
+  scale_color_manual(values=Eudi16_color)+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  ylab("Mean-centered Lesion Area")
+ 
+ ggplot(Summary_Stom_col, aes(SpSurf, mean.stom, color=species_plot, shape=Surface)) +
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=mean.stom-se.stom, ymax=mean.stom+se.stom), width=.8, position = position_dodge(0.1), show.legend = FALSE)+
+  scale_color_manual(values=Eudi16_color)+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  ylab("Mean-centered Stomata Density")
+ 
+ rm(list = ls())
+```
+
+
+# 2. Testing the leaf surface effect within Arabidopsis thaliana
+
+Associated files:
+
+- G24I10_72H.txt
+
+- G24I10_96h.txt
+
+- G24I10_UD_48h.txt
+
+- Genotype_Emmeans_Cat
+
+- Data_Plot_Lesion_GT.txt
+
+R Code: 
+
+- Ara20_72h_all.R
+
+```{r message=FALSE,warning=FALSE, include=FALSE}
+source('~/Desktop/Github_Surface/Ara20_72h_all.R')
+```
+
+```{r message=FALSE,warning=FALSE}
+
+ggplot(Lesion_LS_centered, aes(plot_name, emmean, shape=Surface, color=Plot_Cat)) +
+  geom_point(size=3)+
+  geom_errorbar(aes(ymin=emmean-SE, ymax=emmean+SE), width=.8, position = position_dodge(0.1), show.legend = FALSE)+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))+
+  ylab("Mean-centered Lesion Area")
+
+
+ggplot(data=Data_Plot_Lesion_GTL, aes(Mean_lesion, Surface_Diff)) +
+  geom_point(aes(color=Time_mean)) +
+  scale_fill_manual(values=PaletteP)+
+  ylab("Surface differential in Lesion area [mm2]")+
+  xlab("Lesion area [mm2]")+
+  theme_bw()
+
+
+
+q<- ggplot(data=Data_Plot_Lesion_GTL, aes(Mean_lesion, Surface_Diff)) + 
+  geom_line(aes( group= Genotype.x, color=Genotype.x), linetype=2)+
+  scale_color_manual(values=PaletteN)+
+  theme_bw()+
+  ylab("Surface differential in Lesion area [mm2]")+
+  xlab("Lesion area [mm2]")
+
+direct.label(q,"last.points")
+
+rm(list = ls())
+```
+
+
+
+# 3. Testing the effect of leaf surface on glucosinolate and camalexin content
+
+Associated files:
+
+- GSL_Leaf_Data1.txt
+
+- Cam_Leaf_Data1.txt
+
+- Chemotype_LM_model_pie.txt
+
+R Code: 
+
+- Glucosinolates_Camalexin.R
+
+```{r message=FALSE,warning=FALSE, include=FALSE}
+source('~/Desktop/Github_Surface/Glucosinolates_Camalexin.R')
+```
+
+
+```{r message=FALSE,warning=FALSE}
+
+ggplot(GSL_Data, aes(Genotype, QLLf_3MSO*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("3MSO, nmol/cm2")+
+  theme_bw()
+
+ggplot(GSL_Data, aes(Genotype, QLLf_4MSO*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("4MSO, nmol/cm2")+
+  theme_bw()
+
+ggplot(GSL_Data, aes(Genotype, QLLf_5MSO*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("5MSO, nmol/cm2")+
+  theme_bw()
+
+ggplot(GSL_Data, aes(Genotype, QLLf_6MSO*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("6MSO, nmol/cm2")+
+  theme_bw()
+
+ggplot(GSL_Data, aes(Genotype, QLLf_7MSO*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("7MSO, nmol/cm2")+
+  theme_bw()
+
+ggplot(GSL_Data, aes(Genotype, QLLf_4MT*1000, color=treatSurf))+
+  geom_boxplot()+
+ylab("4MT, nmol/cm2")+
+  theme_bw()
+
+ggplot(GSL_Data, aes(Genotype, QLLf_8MSO*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("8MSO, nmol/cm2")+
+  theme_bw()
+
+
+ggplot(GSL_Data, aes(Genotype, aliphatic*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("Aliphatic glucosinolates, nmol/cm2")+
+  theme_bw()
+
+
+ggplot(GSL_Data, aes(Genotype, indolic*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("Indolic glucosinolates, nmol/cm2")+
+  theme_bw()
+
+ggplot(GSL_Data, aes(Genotype, SC_GSL*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("Short chain glucosinolates, nmol/cm2")+
+  theme_bw()
+
+
+ggplot(GSL_Data, aes(Genotype, LC_GSL*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("Long chain glucosinolates, nmol/cm2")+
+  theme_bw()
+
+
+ggplot(GSL_Data, aes(Genotype, SCProp*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("Shor/Long glucosinolates ratio, nmol/cm2")+
+  theme_bw()
+
+ggplot(GSL_Data, aes(Genotype, LCProp*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("Shor/Long glucosinolates ratio, nmol/cm2")+
+  theme_bw()
+
+
+ggplot(GSL_Data, aes(Genotype, Stress, color=treatSurf))+
+  geom_boxplot()+
+  ylab("Long chain glucosinolates, nmol/cm2")+
+  theme_bw()
+
+
+ggplot(GSL_Data, aes(Genotype, QLLf_I3M*1000, color=treatSurf))+
+  geom_boxplot()+
+  ylab("I3M, nmol/cm2")+
+  theme_bw()
+
+rm(list = ls())
+```
+
+# 4. Testing how the  diverse Botrytis strains interact with the leaf surfaces
+
+
+Associated files:
+
+- Lesion_C0l0_48h.txt
+
+- Col0_UpDown72h.txt
+
+- UpDown_Exp1_Results96.txt
+
+R Code: 
+
+- Bcin96.R
+
+```{r message=FALSE,warning=FALSE, include=FALSE}
+source('~/Desktop/Github_Surface/Bcin96.R')
+```
+
+```{r message=FALSE,warning=FALSE}
+
+
+ggplot(data=S1L, aes(x=Surface, y=emmean)) + 
+  facet_grid(.~Time)+
+  #geom_point()+
+  geom_split_violin(fill="grey")+
+  geom_boxplot(width=0.05)+ 
+  ylab("Lesion area [mm2]")+
+  theme_bw()
+
+
+ggplot(data=Heritability, aes(Time, heritabilityPerc, color=term)) +
+  geom_line(aes(linetype=Cat))+
+  geom_point() +
+  scale_color_manual(values=PalCol)+
+  ylab("Percentage of the variance in lesion area")+
+  xlab("Hours post inoculation")+
+  theme_bw()
+
+
+ggplot(data=All_lsm_497296, aes(emmean, Lsm_diff)) +
+  facet_grid(.~chosen)+
+  #facet_wrap(Isolate~.)+
+  #geom_line(aes(group= Isolate))+
+  geom_line(aes( group= Isolate,linetype=chosen))+
+  scale_linetype_manual(values=c("solid", "dotted"))+
+  geom_point(aes(color=Time)) +
+  ylab("Surface differential in Lesion area [mm2]")+
+  xlab("Lesion area [mm2]")+
+  theme_bw()
+
+
+rm(list = ls())
+```
